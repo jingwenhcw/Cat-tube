@@ -1,6 +1,8 @@
+import React from 'react';
+
 import { Stack } from '@mui/material';
 
-import { ChannelCard, Loader, VideoCard } from './';
+import { ChannelCard, VideoCard } from './';
 
 const Videos = ({ videos, direction }) => {
   return (
@@ -12,10 +14,10 @@ const Videos = ({ videos, direction }) => {
       gap={2}
     >
       {videos.map((item, idx) => (
-        <>
-          {item.id.videoId && <VideoCard key={idx} video={item} />}
-          {item.id.channelId && <ChannelCard key={idx} channelDetail={item} />}
-        </>
+        <React.Fragment key={idx}>
+          {item.id.videoId && <VideoCard video={item} />}
+          {item.id.channelId && <ChannelCard channelDetail={item} />}
+        </React.Fragment>
       ))}
     </Stack>
   );

@@ -1,33 +1,32 @@
-import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ReactPlayer from 'react-player';
+import useAxios from 'axios-hooks';
 import { Typography, Box, Stack } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { Videos, Loader } from './';
-import { fetchFromAPI } from '../utils/fetchFromAPI';
 
 const VideoDetail = () => {
-  const [videoDetail, setVideoDetail] = useState(null);
-  const [videos, setVideos] = useState([]);
   const { id } = useParams();
 
-  useEffect(() => {
-    fetchFromAPI(`videos?part=snippet,statistics&id=${id}`).then((data) =>
-      setVideoDetail(data.items[0])
-    );
+  const [{ data: videoDetailData, loading: videoDetailLoading }] = useAxios(
+    `videos?part=snippet,statistics&id=${id}`
+  );
 
-    fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`).then(
-      (data) => setVideos(data.items)
-    );
-  }, [id]);
+  const [{ data: videosData, loading: videosLoading }] = useAxios(
+    `search?part=snippet&relatedToVideoId=${id}&type=video`
+  );
 
-  if (!videoDetail?.snippet) return <Loader />;
+  if (videoDetailLoading || videosLoading) {
+    return <Loader />;
+  }
 
   const {
     snippet: { title, channelId, channelTitle },
     statistics: { viewCount, likeCount },
-  } = videoDetail;
+  } = videoDetailData.items[0];
+
+  const videos = videosData.items;
 
   return (
     <Box minHeight='95vh'>

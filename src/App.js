@@ -8,6 +8,16 @@ import {
   SearchFeed,
 } from './components';
 
+import { configure } from 'axios-hooks';
+import Axios from 'axios';
+import { axios_options } from './utils/fetchFromAPI';
+
+const axios = Axios.create({
+  ...axios_options,
+});
+
+configure({ axios });
+
 function App() {
   return (
     <BrowserRouter>

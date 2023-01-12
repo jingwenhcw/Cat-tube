@@ -1,27 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
+import useAxios from 'axios-hooks';
 
-import { Videos, Sidebar } from './';
-
-import { fetchFromAPI } from '../utils/fetchFromAPI';
+import { Videos, Sidebar, Loader } from './';
 
 import { categories } from '../utils/constants';
 
 const Feed = () => {
   const [selectedCategory, setSelectedCategory] = useState(categories[0].name);
-  const [videos, setVideos] = useState([]);
 
   const order = categories.find(
     (category) => category.name === selectedCategory
   ).order;
 
-  useEffect(() => {
-    fetchFromAPI(
-      `search?part=snippet&q=${selectedCategory}${
-        order ? `&order=${order}` : ''
-      }`
-    ).then((data) => setVideos(data.items));
-  }, [selectedCategory, order]);
+  const [{ data, loading, error }] = useAxios(
+    `search?part=snippet&q=${selectedCategory}${order ? `&order=${order}` : ''}`
+  );
+
+  if (loading) return <Loader />;
+  if (error) return <p>Error!</p>;
+
+  const videos = data.items;
 
   return (
     <Stack sx={{ flexDirection: { sx: 'column', md: 'row' } }}>

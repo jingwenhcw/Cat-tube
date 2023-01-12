@@ -1,29 +1,26 @@
-import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box } from '@mui/material';
 
-import { Videos, ChannelCard } from './';
-import { fetchFromAPI } from '../utils/fetchFromAPI';
+import { Videos, ChannelCard, Loader } from './';
+import useAxios from 'axios-hooks';
 
 const ChannelDetail = () => {
-  const [channelDetail, setChannelDetail] = useState();
-  const [videos, setVideos] = useState([]);
-
   const { id } = useParams();
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      const data = await fetchFromAPI(`channels?part=snippet&id=${id}`);
-      setChannelDetail(data?.items[0]);
+  const [{ data: channelData, loading: channelLoading }] = useAxios(
+    `channels?part=snippet&id=${id}`
+  );
 
-      const videosData = await fetchFromAPI(
-        `search?channelId=${id}&part=snippet%2Cid&order=date`
-      );
-      setVideos(videosData?.items);
-    };
+  const [{ data: videosData, loading: videosLoading }] = useAxios(
+    `search?channelId=${id}&part=snippet%2Cid&order=date`
+  );
 
-    fetchResults();
-  }, [id]);
+  if (channelLoading || videosLoading) {
+    return <Loader />;
+  }
+
+  const channelDetail = channelData?.items[0];
+  const videos = videosData?.items;
 
   return (
     <Box minHeight='95vh'>
